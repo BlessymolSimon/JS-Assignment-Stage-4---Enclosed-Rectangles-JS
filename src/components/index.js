@@ -18,21 +18,23 @@ function updateStructure(rec1,rec2){
 	//check rec1 encloses rec2
 	if(rec1_top <= rec2_top && rec1_left <= rec2_left && rec2_left+rec2_width <= rec1_left+rec1_width && rec2_top+rec2_height <= rec1_top+rec1_height)
 	{
-		return {
+		let new_rec= {
 			top: (rec2_top-rec1_top)+'px',
 			left: (rec2_left-rec1_left)+'px',
 			width: rec2[width],
 			height: rec2[height]
 		};
+		return new_rec;
 	}
 	else if(rec2_top <= rec1_top && rec2_left <= rec1_left && rec1_left+rec1_width <= rec2_left+rec2_width && rec1_top+rec1_height <= rec2_top+rec2_height)
 	{
-		return {
+		let new_rec= {
 			top: (rec1_top-rec2_top)+'px',
 			left: (rec1_left-rec2_left)+'px',
 			width: rec1[width],
 			height: rec1[height]
 		};
+		return new_rec;
 	}
 	else{
 		return null;

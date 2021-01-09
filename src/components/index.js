@@ -5,40 +5,87 @@
 //	height: '96px'
 //}
 
-function updateStructure(rec1,rec2){
+function updateStructure(recA,recB) {
 	//write your code
-	let rec1_top=parseInt(rec1[top]);
-	let rec1_left=parseInt(rec1[left]);
-	let rec1_width=parseInt(rec1[width]);
-	let rec1_height=parseInt(rec1[height]);
-	let rec2_top=parseInt(rec2[top]);
-	let rec2_left=parseInt(rec2[left]);
-	let rec2_width=parseInt(rec2[width]);
-	let rec2_height=parseInt(rec2[height]);
-	//check rec1 encloses rec2
-	if(rec1_top <= rec2_top && rec1_left <= rec2_left && rec2_left+rec2_width <= rec1_left+rec1_width && rec2_top+rec2_height <= rec1_top+rec1_height)
-	{
-		let new_rec= {
-			top: (rec2_top-rec1_top)+'px',
-			left: (rec2_left-rec1_left)+'px',
-			width: rec2[width],
-			height: rec2[height]
-		};
-		return new_rec;
-	}
-	else if(rec2_top <= rec1_top && rec2_left <= rec1_left && rec1_left+rec1_width <= rec2_left+rec2_width && rec1_top+rec1_height <= rec2_top+rec2_height)
-	{
-		let new_rec= {
-			top: (rec1_top-rec2_top)+'px',
-			left: (rec1_left-rec2_left)+'px',
-			width: rec1[width],
-			height: rec1[height]
-		};
-		return new_rec;
-	}
-	else{
-		return null;
+	if(contains(recA, recB)) {
+		const relativeDim = relative(recA, recB);
+		return {...recA, children: [relativeDim]};
+	} else if(contains(recB, recA)) {
+		const relativeDim = relative(recB, recA);
+		return {...recB, children: [relativeDim]};
+	} else {
+		return {...recA}
 	}
 }
+
+const T = 0;
+const W = 0;
+
+function normalise(rec) {
+	return {
+		x1: rec.top ? parseInt(rec.top): (T - (parseInt(rec.bottom) + parseInt(rec.height))),
+		y1: rec.left ? parseInt(rec.left): (W - (parseInt(rec.right) + parseInt(rec.width))),
+		x2: rec.bottom ? (T - parseInt(rec.bottom)): (parseInt(rec.top) + parseInt(rec.height)),
+		y2: rec.right ? (W- parseInt(rec.right)): (parseInt(rec.left) + parseInt(rec.width))
+	}
+}
+
+function contains(recA, recB) {
+	const recAn = normalise(recA);
+	const recBn = normalise(recB);
+
+	if(
+		recAn.x1 <= recBn.x1 &&
+		recAn.y1 <= recBn.y1 &&
+		recAn.x2 >= recBn.x2 &&
+		recAn.y2 >= recBn.y2
+	) {
+		return true;
+	}
+	return false;
+}
+
+function relative(recA, recB) {
+	const recAn = normalise(recA);
+	const recBn = normalise(recB);
+	const res = {
+		children: recB.children
+	}
+	if(recB.top) {
+		res.top = `${recBn.x1 - recAn.x1}px` ;
+	}
+	if(recB.left) {
+		res.left = `${ recBn.y1 - recAn.y1}px` ;
+	}
+	if(recB.height) {
+		res.height= recB.height;
+	}
+	if(recB.width) {
+		res.width = recB.width;
+	}
+	if(recB.bottom) {
+		res.bottom = `${recAn.x2 - recBn.x2}px`;
+	}
+	if(recB.right) {
+		res.right = `${recAn.y2 - recBn.y2}px`;
+	}
+	return res;
+}
+
+// const rectangle1 = {
+// 	top:'20px',
+// 	left:'20px',
+// 	height:'40px',
+// 	width:'60px',
+// 	children:[]
+// };
+// const rectangle2 = {
+// 	top:'30px',
+// 	left:'30px',
+// 	height:'20px',
+// 	width:'30px',
+// 	children:[]
+// };
+// console.log(updateStructure(rectangle1, rectangle2));
 
 module.exports = updateStructure;
